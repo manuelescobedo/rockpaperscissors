@@ -1,4 +1,5 @@
-
+using System;
+using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -28,16 +29,31 @@ namespace API
                 config.Filters.Add(new ExceptionFilter());
             });
 
+            services.AddCors(options =>
+                {
+                    options.AddPolicy("Cors",
+                        builder => builder.WithOrigins("https://localhost:5001S"));
+                }
+            );
+
+
+            services.AddSwaggerGen(s => {
+                s.SwaggerDoc("v1", new OpenApiInfo {
+                    Title = "Rock, Paper & Scissors", 
+                    Version ="v1",
+                    Description = "API Example",
+                    Contact = new OpenApiContact {
+                        Name ="Mani Escareno",
+                        Email = "bigmander@gmail.com",
+                        Url = new Uri ("https://localhost:8100")
+                    }
+                } );
+            });
+
             services.AddDbContext<GameDbContext>();
 
             services.AddTransient<IGameRepository, GameRepository>();
 
-            services.AddCors(options =>
-                {
-                    options.AddPolicy("Cors",
-                        builder => builder.WithOrigins("https://localhost:5001"));
-                }
-            );
         }
 
 
@@ -49,9 +65,16 @@ namespace API
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseCors("Cors");
+
+            app.UseSwagger();
+            app.UseSwaggerUI(s => {
+                s.SwaggerEndpoint("/swagger/v1/swagger.json","Rock, Paper & Scissors");
+                s.RoutePrefix = String.Empty;
+            });
+
             app.UseHttpsRedirection();
 
-            app.UseCors("Cors");
 
             app.UseRouting();
 
