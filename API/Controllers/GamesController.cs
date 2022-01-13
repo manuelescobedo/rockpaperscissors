@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Domain;
 using Infrastructure.Repositories;
 using API.DTOs;
@@ -9,8 +10,9 @@ using API.DTOs;
 namespace API.Controllers
 {
 
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
+    [Produces("application/json")]
     public class GamesController : ControllerBase
     {
 
@@ -23,6 +25,7 @@ namespace API.Controllers
 
         // GET api/games/{id}
         [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<GameDTO>), StatusCodes.Status200OK)]
         public ActionResult Get()
         {
 
@@ -34,6 +37,9 @@ namespace API.Controllers
 
         // GET api/games/{id}
         [HttpGet("{id}")]
+
+        [ProducesResponseType(typeof(GameDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public ActionResult Get(Guid id)
         {
 
@@ -46,6 +52,8 @@ namespace API.Controllers
 
         // POST api/games
         [HttpPost]
+
+        [ProducesResponseType(typeof(GameDTO), StatusCodes.Status201Created)]
         public ActionResult Register([FromBody] NewGameDTO payload)
         {
 
@@ -59,6 +67,9 @@ namespace API.Controllers
 
         // PUT api/games/{id}/over
         [HttpPut("{id}/[action]")]
+
+        [ProducesResponseType(typeof(string), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public ActionResult Over(Guid id)
         {
 
@@ -75,6 +86,8 @@ namespace API.Controllers
 
         // PUT api/games/{id}/resume
         [HttpPut("{id}/[action]")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public ActionResult Resume(Guid id)
         {
             var game = _gameRepository.Get(id);
@@ -90,6 +103,8 @@ namespace API.Controllers
 
         // PUT api/games/{id}/restart
         [HttpPut("{id}/[action]")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public ActionResult Restart(Guid id)
         {
 
@@ -108,6 +123,8 @@ namespace API.Controllers
 
         // PUT api/games/{id}/matches
         [HttpPost("{id}/matches")]
+        [ProducesResponseType(typeof(MatchDTO),StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public ActionResult AddMatch(Guid id, [FromBody] NewMatchDTO payload)
         {
 
@@ -125,6 +142,8 @@ namespace API.Controllers
         }
 
         [HttpGet("{id}/matches/{matchId}")]
+        [ProducesResponseType(typeof(MatchDTO),StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public ActionResult GetMatch(Guid id, Guid matchId)
         {
             var game = _gameRepository.Get(id);
